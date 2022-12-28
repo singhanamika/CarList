@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  RefreshControl,
   View,
   Text,
   TextInput,
@@ -10,12 +11,16 @@ import {
 } from "react-native";
 import filter from "lodash.filter";
 
+const wait = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 const CarList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [fullData, setFullData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -49,6 +54,12 @@ const CarList = () => {
       </View>
     );
   }
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setData(fullData);
+    wait(2000).then(() => setRefreshing(false));
+  };
 
   const handleSearch = (text) => {
     const formattedQuery = text.toLowerCase();
@@ -103,6 +114,9 @@ const CarList = () => {
         ListHeaderComponentStyle={{ zIndex: 100000 }}
         data={data}
         keyExtractor={({ id }) => id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={({ item }) => (
           <View style={styles.listItem}>
             <Image
