@@ -130,6 +130,19 @@ const CarList = () => {
     }
   };
 
+  const dropDownFlter = (item) => {
+    const result = fullData.filter((val) => {
+      if (selected === "Color") {
+        return val.car_color == item.value;
+      } else if (selected === "Model") {
+        return val.car_model == item.value;
+      } else if (selected === "Year") {
+        return val.car_model_year == item.value;
+      }
+    });
+    setData(result);
+  };
+
   function renderHeader() {
     return (
       <View>
@@ -164,6 +177,7 @@ const CarList = () => {
             }}
           >
             <DropDownPicker
+              onSelectItem={dropDownFlter}
               open={childOpen}
               items={childValue}
               value={childItem}
