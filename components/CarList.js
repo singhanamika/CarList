@@ -2,16 +2,20 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   ActivityIndicator,
   StyleSheet,
   Image,
 } from "react-native";
+import filter from "lodash.filter";
 
 const CarList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState("");
+  const [fullData, setFullData] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -46,9 +50,53 @@ const CarList = () => {
     );
   }
 
+  const handleSearch = (text) => {
+    const formattedQuery = text.toLowerCase();
+    const filteredData = filter(fullData, (user) => {
+      return contains(user, formattedQuery);
+    });
+    setData(filteredData);
+    setQuery(text);
+  };
+
+  const contains = ({ car, car_model, car_color, car_vin, price }, query) => {
+    if (
+      car.toLowerCase().includes(query) ||
+      car_model.toLowerCase().includes(query) ||
+      car_color.toLowerCase().includes(query) ||
+      car_vin.toLowerCase().includes(query) ||
+      price.toLowerCase().includes(query)
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Car List</Text>
+      <View
+        style={{
+          backgroundColor: "#fff",
+          padding: 10,
+          marginVertical: 20,
+          borderRadius: 20,
+          height: 40,
+          margin: 12,
+          borderWidth: 1,
+          width: 300,
+        }}
+      >
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+          value={query}
+          onChangeText={(queryText) => handleSearch(queryText)}
+          placeholder="Search"
+          style={{ backgroundColor: "#fff", paddingHorizontal: 20 }}
+        />
+      </View>
       <FlatList
         keyboardShouldPersistTaps="always"
         ListHeaderComponent={renderHeader}
