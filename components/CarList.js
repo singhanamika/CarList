@@ -10,6 +10,7 @@ import {
   Image,
 } from "react-native";
 import filter from "lodash.filter";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const wait = (timeout) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -20,6 +21,17 @@ const CarList = () => {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [fullData, setFullData] = useState([]);
+  const [selected, setSelected] = useState("");
+  const [open, setOpen] = useState(false);
+  const [childOpen, setChildOpen] = useState(false);
+  const [filterOption, setfilteroption] = useState([
+    { label: "Year", value: "year" },
+    { label: "Color", value: "color" },
+    { label: "Model", value: "model" },
+  ]);
+  const [value, setValue] = useState(null);
+  const [childItem, setChilditem] = useState(null);
+  const [childValue, setChildValue] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -82,6 +94,90 @@ const CarList = () => {
     }
     return false;
   };
+
+  const changeSelectOptionHandler = (item) => {
+    setSelected(item.label);
+    if (item.label === "Color") {
+      const colorData = [...new Set(data.map((val) => val.car_color))];
+      var color = colorData.map(function (val, index) {
+        return {
+          id: index,
+          value: val,
+          label: val,
+        };
+      });
+      return setChildValue(color);
+    } else if (item.label === "Model") {
+      const modelData = [...new Set(data.map((val) => val.car_model))];
+      var model = modelData.map(function (val, index) {
+        return {
+          id: index,
+          value: val,
+          label: val,
+        };
+      });
+      return setChildValue(model);
+    } else if (item.label === "Year") {
+      const yearData = [...new Set(data.map((val) => val.car_model_year))];
+      var year = yearData.map(function (val, index) {
+        return {
+          id: index,
+          value: val,
+          label: val,
+        };
+      });
+      return setChildValue(year);
+    }
+  };
+
+  function renderHeader() {
+    return (
+      <View>
+        <View
+          style={{
+            width: 120,
+            flexDirection: "row",
+          }}
+        >
+          <View
+            style={{
+              padding: 5,
+              margin: 5,
+              marginLeft: 10,
+            }}
+          >
+            <DropDownPicker
+              onSelectItem={changeSelectOptionHandler}
+              open={open}
+              value={value}
+              items={filterOption}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setfilteroption}
+              key={filterOption}
+            />
+          </View>
+          <View
+            style={{
+              padding: 5,
+              margin: 5,
+            }}
+          >
+            <DropDownPicker
+              open={childOpen}
+              items={childValue}
+              value={childItem}
+              setValue={setChilditem}
+              setOpen={setChildOpen}
+              setItems={setChildValue.value}
+              key={setChildValue.id}
+              listMode="SCROLLVIEW"
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
